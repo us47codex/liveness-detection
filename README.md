@@ -19,9 +19,7 @@ Add it in your root build.gradle at the end of repositories:
 		}
 	}
 			
- 
-			Or
-Add it in your root settings.gradle.kts at the end of repositories:
+**Or** Add it in your root settings.gradle.kts at the end of repositories:
 
 	repositories {
 		...
