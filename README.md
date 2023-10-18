@@ -1,13 +1,22 @@
 Liveness Detection [![](https://jitpack.io/v/us47codex/liveness-detection.svg)](https://jitpack.io/#us47codex/liveness-detection)
 ===================
 
-A lib which allow you to detect liveness using Camera.
+A lib which allow you to detect liveness using Camera. And capture images for such task
 
 ## Features ##
 
-* Liveness Detection
+* Liveness Detection with multiple Detection task
+	* Face Detection
+ 	* Eyes Blink Detection
+  	* Smile Detection
+  	* Face Shake Detection
+  	* Mouth Detection
+* Image Capture and show on all detection task completion
+* Validation on multiple face detect and reinitialize from first detection task
+* Validation on face change in between any detection task, it will reinitialize from first detection task
 
-
+Download
+--------
 Step 1. Add the JitPack repository to your build file
 
 Add it in your root build.gradle at the end of repositories:
@@ -33,12 +42,56 @@ Step 2. Add the dependency
 	        implementation 'com.github.us47codex:liveness-detection:1.0.0'
 	}
 
-Download
+Usage
 --------
 
 ```kotlin
-    implementation 'com.github.us47codex:liveness-detection:1.0.0'
+	// Add detection task which you want to perform
+	private var livenessDetector = LivenessDetector(
+        	FacingDetectionTask(),
+        	EyesBlinkDetectionTask(),
+        	ShakeDetectionTask(),
+        	MouthOpenDetectionTask(),
+        	SmileDetectionTask()
+    	)
+
+	// Set Image analyser as FaceAnalyser
+	private fun startCamera() {
+        	var cameraController = LifecycleCameraController(this)
+        	cameraController.cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+        	cameraController.setImageAnalysisAnalyzer(
+            		ContextCompat.getMainExecutor(this),
+            		FaceAnalyzer(buildLivenessDetector())
+        	)
+        	cameraController.bindToLifecycle(this)
+        	binding.cameraPreview.controller = cameraController
+
+        	binding.cameraSwitch.setOnClickListener {
+            		cameraController.cameraSelector =
+                		if (cameraController.cameraSelector == CameraSelector.DEFAULT_BACK_CAMERA) CameraSelector.DEFAULT_FRONT_CAMERA else 						CameraSelector.DEFAULT_BACK_CAMERA
+        	}
+    	}
+
+	// Task Detecter Listener
+	private fun buildLivenessDetector(): LivenessDetector {
+        	val listener = object : LivenessDetector.Listener {
+            		override fun onTaskStarted(task: DetectionTask) {
+                		// onTaskStarted
+            		}
+
+            		override fun onTaskCompleted(task: DetectionTask, isLastTask: Boolean) {
+               			// onTaskCompleted. You can also take picture using camerController
+			}
+
+			override fun onTaskFailed(task: DetectionTask, code: Int) {
+               			// code can be LivenessDetector.ERROR_MULTI_FACES etc
+            		}
+        	}
+
+        return livenessDetector.also { it.setListener(listener) }
+    }
 ```
+
 License
 -------
 
