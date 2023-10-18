@@ -18,8 +18,9 @@ Add it in your root build.gradle at the end of repositories:
 			maven { url 'https://jitpack.io' }
 		}
 	}
-			Or
+			
  
+			Or
 Add it in your root settings.gradle.kts at the end of repositories:
 
 	repositories {
